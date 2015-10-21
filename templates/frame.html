@@ -1,3 +1,8 @@
+{% if not session['loggedin'] %}
+<script>
+window.location.href = "/login";
+</script>
+{% endif %}
 <!doctype html>
 <html lang="en">
   <head>
