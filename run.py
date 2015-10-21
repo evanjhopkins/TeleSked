@@ -7,12 +7,11 @@ app = Flask(__name__)
 app.secret_key = "a6(*&sKJH9*dflKJH9*&)&"
 
 @app.route('/')
-@app.route('/index')
-def index():
-	return render_template('index.html')
-
 @app.route('/overview')
 def overview():
+	if (not loggedIn()):
+		return redirect('/login', code=302)
+
 	calls = {'calls':[
 		{'fname': 'Larry', 'lname':'Bird', 'position':'back-end dev', 'status':'pending'},
 		{'fname': 'Derek', 'lname':'Cheater', 'position':'Suzie assistant', 'status':'accepted'},
@@ -22,7 +21,6 @@ def overview():
 
 @app.route('/login', methods=["GET","POST"])
 def login():
-	print request.form
 	try:
 		phone = request.form['phone']
 		if(phone == '2152084360'):
@@ -32,7 +30,18 @@ def login():
 		pass
 	return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+	session.clear()
+	return redirect('/login', code=302)
+
 #utilities
+def loggedIn():
+	if ('loggedin' in session):
+		if(session['loggedin'] == True):
+			return True
+	return False
+
 def query(stmt):
 	try:
 		db = MySQLdb.connect("localhost","root","bbemt","creditcalc")
