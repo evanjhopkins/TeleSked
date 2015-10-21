@@ -25,5 +25,15 @@
   {% endfor %}
 {% endblock %}
 
+{% block modal %}
+test
+{% endblock %}
+
 {% block script %}
+<script>
+$(".call").click(function(){
+  $("#modal").fadeIn();
+  $("#modal").removeClass("hide");
+});
+</script>
 {% endblock %}
