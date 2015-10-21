@@ -1,0 +1,41 @@
+.call{
+	position: relative;
+	margin-top: 10px;
+	border: solid 1px;
+	padding: 5px 5px 5px 10px;
+	border-radius: 10px;
+}
+.call:hover{
+	cursor: pointer;
+	opacity: 0.8;
+}
+.call .name{
+	font-size: 23px;
+}
+.call .name .position{
+	font-size: 15px;
+	color: #B3B3AE;
+}
+.call .subtext{
+	color: #707070;
+	margin-left: 20px;
+}
+.call .icon{
+	position: absolute;
+	right: 20px;
+	top: 15px;
+	font-size: 25px;
+}
+
+.pending{
+	background-color: #FCF8E1;
+	border-color: #FAEBC8;
+}
+.accepted{
+	background-color: #E0F0D6;
+	border-color: #D8E9C2;
+}
+.declined{
+	background-color: #F1DEDE;
+	border-color: #E9CCD1;
+}

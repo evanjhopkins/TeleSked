@@ -9,7 +9,12 @@ app.secret_key = "a6(*&sKJH9*dflKJH9*&)&"
 @app.route('/')
 @app.route('/index')
 def index():
-	return render_template('index.html')
+	calls = {'calls':[
+		{'fname': 'Larry', 'lname':'Bird', 'position':'back-end dev', 'status':'pending'},
+		{'fname': 'Derek', 'lname':'Cheater', 'position':'Suzie assistant', 'status':'accepted'},
+		{'fname': 'Lester', 'lname':'Dingle', 'position':'HR front desk', 'status':'declined'}
+	]}
+	return render_template('overview.html', data=calls)
 
 #utilities
 def query(stmt):

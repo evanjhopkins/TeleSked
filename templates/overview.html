@@ -1,0 +1,28 @@
+{% extends "frame.html" %}
+
+{% block imports %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/overview.css') }}" />
+{% endblock %}
+
+{% block content %}
+  {% for call in data.calls %}
+  <div class="call {{call['status']}}">
+    <div class="name">
+      {{call['fname']}} {{call['lname']}}
+       <span class="position">({{call['position']}})</span></div>
+    {% if call['status']=='accepted' %}
+      <div class="subtext">Call accepted on</div>
+      <i class="icon fa fa-check-square-o" title="Accepted"></i>
+    {% elif call['status']=='pending' %}
+      <div class="subtext">Call is pending acceptance from recipient</div>
+      <i class="icon fa fa-paper-plane-o" title="Pending"></i>
+    {% elif call['status']=='declined' %}
+      <div class="subtext">Call was declined by recipient</div>
+      <i class="icon fa fa-ban" title="Declined"></i>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
