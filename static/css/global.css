@@ -27,6 +27,22 @@ body {
 	left:0;
 }
 
+.nav{
+  float: right;
+}
+.topbar{
+  width: 60%;
+  margin-left: 20%;
+}
+.nav a{
+  text-decoration: none;
+  color: #000000;
+  margin-left: 15px;
+}
+.nav a:hover{
+  opacity: 0.8;
+}
+
 button {
   display: inline-block;
   padding: 5px 10px;
