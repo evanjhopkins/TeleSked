@@ -22,9 +22,13 @@ def overview():
 
 @app.route('/login', methods=["GET","POST"])
 def login():
+	session.clear()
 	try:
 		phone = request.form['phone']
-		if(phone == '2152084360'):
+		result = query ("SELECT * FROM USER WHERE phone=%s" % phone )
+		if len(result)>0:
+			session['phone'] = result[0]
+			session['uid'] = result[0]
 			session['loggedin'] = True
 			return redirect('/overview', code=302)
 	except:
