@@ -12,11 +12,12 @@ def overview():
 	if (not loggedIn()):
 		return redirect('/login', code=302)
 
-	calls = {'calls':[
-		{'fname': 'Larry', 'lname':'Bird', 'position':'back-end dev', 'status':'pending'},
-		{'fname': 'Derek', 'lname':'Cheater', 'position':'Suzie assistant', 'status':'accepted'},
-		{'fname': 'Lester', 'lname':'Dingle', 'position':'HR front desk', 'status':'declined'}
-	]}
+	calls = {'calls':[]}
+	results = query("SELECT `CALL`.FNAME, `CALL`.LNAME, `CALL`.POSITION, STATUS.STATUS, `CALL`.CALL_TIME FROM `CALL`, STATUS WHERE `CALL`.STATUS = STATUS.ID")
+	for call in results:
+		calltime = call[4]
+		calls['calls'].append({'fname':call[0], 'lname':call[1], 'position':call[2], 'status':call[3], 'calltime':calltime })
+
 	return render_template('overview.html', data=calls)
 
 @app.route('/login', methods=["GET","POST"])
@@ -43,8 +44,9 @@ def loggedIn():
 	return False
 
 def query(stmt):
+	print stmt
 	try:
-		db = MySQLdb.connect("localhost","root","bbemt","creditcalc")
+		db = MySQLdb.connect("localhost","root","sked","telesked")
 		cur = db.cursor()
 		cur.execute(stmt)
 		results = cur.fetchall()

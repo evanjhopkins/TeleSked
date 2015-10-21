@@ -12,7 +12,7 @@
       {{call['fname']}} {{call['lname']}}
        <span class="position">({{call['position']}})</span></div>
     {% if call['status']=='accepted' %}
-      <div class="subtext">Call accepted on</div>
+      <div class="subtext">Call accepted at: {{call['calltime']}}</div>
       <i class="icon fa fa-check-square-o" title="Accepted"></i>
     {% elif call['status']=='pending' %}
       <div class="subtext">Call is pending acceptance from recipient</div>
