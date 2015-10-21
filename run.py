@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 import hashlib
 import MySQLdb
 import json
@@ -9,12 +9,28 @@ app.secret_key = "a6(*&sKJH9*dflKJH9*&)&"
 @app.route('/')
 @app.route('/index')
 def index():
+	return render_template('index.html')
+
+@app.route('/overview')
+def overview():
 	calls = {'calls':[
 		{'fname': 'Larry', 'lname':'Bird', 'position':'back-end dev', 'status':'pending'},
 		{'fname': 'Derek', 'lname':'Cheater', 'position':'Suzie assistant', 'status':'accepted'},
 		{'fname': 'Lester', 'lname':'Dingle', 'position':'HR front desk', 'status':'declined'}
 	]}
 	return render_template('overview.html', data=calls)
+
+@app.route('/login', methods=["GET","POST"])
+def login():
+	print request.form
+	try:
+		phone = request.form['phone']
+		if(phone == '2152084360'):
+			session['loggedin'] = True
+			return redirect('/overview', code=302)
+	except:
+		pass
+	return render_template('login.html')
 
 #utilities
 def query(stmt):
