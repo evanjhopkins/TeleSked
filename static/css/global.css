@@ -13,6 +13,7 @@ body {
 	padding:10px;
 }
 #content {
+  margin-top: 25px;
 	padding-bottom:20px; /* Height of the footer element */
   width: 60%;
   margin-left: 20%;
@@ -24,4 +25,21 @@ body {
 	position:absolute;
 	bottom:0;
 	left:0;
+}
+
+button {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 13px;
+  line-height: 1.8;
+  appearance: none;
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  background-color: #6695CC;
+  color: #FFFFFF;
+}
+button:hover {
+  cursor: pointer;
+  background-color: #366396;
 }
