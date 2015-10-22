@@ -46,6 +46,9 @@
 	border-color: #E9CCD1;
 }
 
+.call_info{
+	margin-bottom: 25px;
+}
 #modal_content{
 	float: left;
 }

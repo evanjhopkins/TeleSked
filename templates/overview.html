@@ -27,6 +27,7 @@
 
 {% block modal %}
 <div class="call_info"></div>
+<span class="call_id"></span>
 <button class="btn">Save</button>
 <button class="del btn">Cancel Call</button>
 {% endblock %}
@@ -36,11 +37,20 @@
 $(".call").click(function(e){
   var call_id = e.currentTarget.id;
   $.get( "/getcall/"+call_id, function( data ) {
+    $( ".call_id" ).text(call_id);
     $( ".call_info" ).text( data );
     $("#modal").fadeIn();
     $("#modal").removeClass("hide");
   });
 
 });
+
+$(".del").click(function(e){
+    var call_id = $( ".call_id" ).text();
+    $.get( "/delcall/"+call_id, function( data ) {
+        location.reload();
+    });
+});
+
 </script>
 {% endblock %}

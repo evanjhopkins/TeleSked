@@ -59,10 +59,14 @@ def addcall():
 
 @app.route('/getcall/<int:call_id>')
 def getcall(call_id):
-	print call_id
 	result = query("SELECT * FROM `CALL` WHERE ID=%s" % call_id)[0]
 	call = {'id':result[0], 'phone':result[1], 'fname':result[2], 'lname':result[3], 'position':result[4], 'description':result[5], 'status':result[6],}
 	return prepare_for_departure(content=call, success=True)
+
+@app.route('/delcall/<int:call_id>')
+def delcall(call_id):
+	result = query("DELETE FROM `CALL` WHERE ID=%s" % call_id)
+	return prepare_for_departure(success=True)
 
 #utilities
 def loggedIn():
