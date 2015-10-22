@@ -27,18 +27,32 @@ def login():
 		phone = request.form['phone']
 		result = query ("SELECT * FROM USER WHERE phone=%s" % phone )
 		if len(result)>0:
-			session['phone'] = result[0]
-			session['uid'] = result[0]
+			session['phone'] = result[0][1]
+			session['uid'] = result[0][0]
 			session['loggedin'] = True
 			return redirect('/overview', code=302)
 	except:
 		pass
 	return render_template('login.html')
 
+@app.route('/schedule')
+def schedule():
+	return render_template('schedule.html')
+
 @app.route('/logout')
 def logout():
 	session.clear()
 	return redirect('/login', code=302)
+
+@app.route('/addcall', methods=['POST'])
+def addcall():
+	if(not loggedIn()):
+		return prepare_for_departure(success=False)
+
+	data = request.form
+	sql = "INSERT INTO `CALL` (PHONE, FNAME, LNAME, POSITION, DESCRIPTION, STATUS, REP_ID) VALUES('%s', '%s', '%s', '%s', '%s', 2, '%s')" % (data['phone'], data['fname'], data['lname'], data['position'], data['description'], session['uid'])
+	query(sql)
+	return prepare_for_departure(success=True)
 
 #utilities
 def loggedIn():
@@ -48,7 +62,7 @@ def loggedIn():
 	return False
 
 def query(stmt):
-	print stmt
+	print "QUERY-> "+stmt
 	try:
 		db = MySQLdb.connect("localhost","root","sked","telesked")
 		cur = db.cursor()

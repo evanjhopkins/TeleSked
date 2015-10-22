@@ -1,0 +1,72 @@
+{% extends "frame.html" %}
+
+{% block imports %}
+<script src="http://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/schedule.css') }}" />
+<script src="{{ url_for('static',filename='js/Datepair.js') }}" ></script>
+<script src="{{ url_for('static',filename='js/jquery.datepair.js') }}" ></script>
+<script src="//jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
+<link rel="stylesheet" href="//jonthornton.github.io/jquery-timepicker/jquery.timepicker.css">
+
+
+{% endblock %}
+
+{% block content %}
+  <form id="addcall">
+    <table>
+      <tr><td><span class="req">*</span>First Name:</td><td><input name="fname" type="text" /></td></tr>
+      <tr><td><span class="req">*</span>Last Name:</td><td><input name="lname" type="text" /></td></tr>
+      <tr><td><span class="req">*</span>Phone:</td><td><input name="phone" type="text" /></td></tr>
+      <tr><td><span class="req">*</span>Position:</td><td><input name="position" type="text" /></td></tr>
+      <tr><td><span class="req">*</span>Date:</td><td><input name="date" type="text" class="date start" /></td></tr>
+      <tr><td><span class="req">*</span>Time:</td><td><input name="time" type="text" class="time start" /></td></tr>
+      <tr><td>Description:</td><td><textarea name="description"></textarea></td></tr>
+    </table>
+    <button class="new_call">Schedule Call</button>
+  </form>
+
+{% endblock %}
+
+{% block modal %}
+{% endblock %}
+
+{% block script %}
+<script>
+  $(function() {
+    $(".date").datepicker();
+  });
+  $(function() {
+    $('.time').timepicker({
+      'step': function(i) {
+          return (i%2) ? 15 : 45;
+      }
+    });
+  });
+
+  $('#addcall').submit(function(e){
+    e.preventDefault();
+    //get form data
+    var data = $('#addcall').serializeArray();
+
+    //validate form
+    for (var i in data){
+      if(data[i].value==""){
+        $(".alert").text("Please complete all fields");
+        return;
+      }
+    }
+
+    //make request
+    $.post( "/addcall", data)
+    .done(function( data ) {
+      data = JSON.parse(data);
+      if(data.success == true){
+        window.location.href='/overview'
+      }else{
+        $(".alert").text("Error");
+      }
+    });
+  });
+</script>
+{% endblock %}

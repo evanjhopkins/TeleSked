@@ -42,6 +42,12 @@ body {
 .nav a:hover{
   opacity: 0.8;
 }
+.alert{
+  background-color: #F1DEDE;
+  color: #A54540;
+  width: 96%;
+  margin-bottom: 25px;
+}
 
 #modal{
   position: fixed;
