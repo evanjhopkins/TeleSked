@@ -4,3 +4,16 @@
 .new_call{
   float: right;
 }
+
+#addcall{
+  margin-left: 20%;
+}
+.field_title{
+  height: 50px;
+  font-size: 25px;
+}
+.field_input{
+  width: 200px;
+  font-size: 18px;
+  padding: 5px;
+}
