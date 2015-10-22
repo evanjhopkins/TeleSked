@@ -45,3 +45,19 @@
 	background-color: #F1DEDE;
 	border-color: #E9CCD1;
 }
+
+#modal_content{
+	float: left;
+}
+.btn{
+	display: inline-block;
+	float: right;
+	min-width: 50px;
+}
+.del{
+	background-color: #A54540;
+	float: left;
+}
+.del:hover{
+	background-color: #993333;
+}

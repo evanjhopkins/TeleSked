@@ -13,10 +13,10 @@ def overview():
 		return redirect('/login', code=302)
 
 	calls = {'calls':[]}
-	results = query("SELECT `CALL`.FNAME, `CALL`.LNAME, `CALL`.POSITION, STATUS.STATUS, `CALL`.CALL_TIME FROM `CALL`, STATUS WHERE `CALL`.STATUS = STATUS.ID")
+	results = query("SELECT `CALL`.FNAME, `CALL`.LNAME, `CALL`.POSITION, STATUS.STATUS, `CALL`.CALL_TIME, `CALL`.ID FROM `CALL`, STATUS WHERE `CALL`.STATUS = STATUS.ID")
 	for call in results:
 		calltime = call[4]
-		calls['calls'].append({'fname':call[0], 'lname':call[1], 'position':call[2], 'status':call[3], 'calltime':calltime })
+		calls['calls'].append({'fname':call[0], 'lname':call[1], 'position':call[2], 'status':call[3], 'calltime':calltime, 'id':call[5] })
 
 	return render_template('overview.html', data=calls)
 
@@ -37,6 +37,9 @@ def login():
 
 @app.route('/schedule')
 def schedule():
+	if (not loggedIn()):
+		return redirect('/login', code=302)
+
 	return render_template('schedule.html')
 
 @app.route('/logout')
@@ -53,6 +56,13 @@ def addcall():
 	sql = "INSERT INTO `CALL` (PHONE, FNAME, LNAME, POSITION, DESCRIPTION, STATUS, REP_ID) VALUES('%s', '%s', '%s', '%s', '%s', 2, '%s')" % (data['phone'], data['fname'], data['lname'], data['position'], data['description'], session['uid'])
 	query(sql)
 	return prepare_for_departure(success=True)
+
+@app.route('/getcall/<int:call_id>')
+def getcall(call_id):
+	print call_id
+	result = query("SELECT * FROM `CALL` WHERE ID=%s" % call_id)[0]
+	call = {'id':result[0], 'phone':result[1], 'fname':result[2], 'lname':result[3], 'position':result[4], 'description':result[5], 'status':result[6],}
+	return prepare_for_departure(content=call, success=True)
 
 #utilities
 def loggedIn():

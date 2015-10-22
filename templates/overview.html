@@ -7,7 +7,7 @@
 {% block content %}
   <button onclick="window.location.href='/schedule'" class="new_call">Schedule Call <i class="fa fa-plus-square-o"></i></button>
   {% for call in data.calls %}
-  <div class="call {{call['status']}}">
+  <div class="call {{call['status']}}" id="{{call['id']}}">
     <div class="name">
       {{call['fname']}} {{call['lname']}}
        <span class="position">({{call['position']}})</span></div>
@@ -26,14 +26,21 @@
 {% endblock %}
 
 {% block modal %}
-test
+<div class="call_info"></div>
+<button class="btn">Save</button>
+<button class="del btn">Cancel Call</button>
 {% endblock %}
 
 {% block script %}
 <script>
-$(".call").click(function(){
-  $("#modal").fadeIn();
-  $("#modal").removeClass("hide");
+$(".call").click(function(e){
+  var call_id = e.currentTarget.id;
+  $.get( "/getcall/"+call_id, function( data ) {
+    $( ".call_info" ).text( data );
+    $("#modal").fadeIn();
+    $("#modal").removeClass("hide");
+  });
+
 });
 </script>
 {% endblock %}
