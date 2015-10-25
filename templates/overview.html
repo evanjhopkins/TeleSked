@@ -2,6 +2,10 @@
 
 {% block imports %}
 <link rel="stylesheet" href="{{ url_for('static',filename='css/overview.css') }}" />
+<script src="//jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
+<link rel="stylesheet" href="//jonthornton.github.io/jquery-timepicker/jquery.timepicker.css">
+<script src="http://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
 {% endblock %}
 
 {% block content %}
@@ -26,10 +30,36 @@
 {% endblock %}
 
 {% block modal %}
-<div class="call_info"></div>
-<span class="call_id"></span>
-<button class="btn">Save</button>
+<div class="call_info">
+  <span class="call_id hide"></span>
+  <span class="call_fname name"></span> <span class="call_lname name"></span><span class="status name"></span>
+  <hr>
+  <div class="call_info_table">
+    <div class="left">
+      <div class="info_bit"><span class="info_title">Phone:</span><br><span class="call_phone"></span></div>
+      <div class="info_bit"><span class="info_title">Position:</span><br><span class="call_position"></span></div>
+    </div>
+    <div class="right">
+      <div class="info_bit"><span class="info_title">Status:</span><br><span class="call_status"></span></div>
+      <div class="info_bit"><span class="info_title">Call Date:</span><br><span class="call_date"></span></div>
+    </div><br>
+    <div class="info_bit"><span class="info_title double">Description:</span><br><span class="call_description"></span></div>
+
+    <!-- <div class="info_bit"><span class="info_title">Response</span><br><span class="response"></span></div> -->
+  </div>
+
+</div>
+
+<div class="modal_btns">
+  <hr>
+<button class="btn cancel">Cancel</button>
+<button class="btn save">Save</button>
+<button class="btn edit">Edit</button>
+<button class="btn propose">Propose New Time</button>
+<input class="time btn" type="text" placeholder="time">
+<input class="date btn" type="text" placeholder="date">
 <button class="del btn">Cancel Call</button>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -37,10 +67,36 @@
 $(".call").click(function(e){
   var call_id = e.currentTarget.id;
   $.get( "/getcall/"+call_id, function( data ) {
-    $( ".call_id" ).text(call_id);
-    $( ".call_info" ).text( data );
+    response = JSON.parse(data);
+    $( ".propose, .date, .time, .save, .cancel" ).hide();
+    $( ".edit, .del" ).show();
+
+    $( ".call_fname" ).text(response.content.fname);
+    $( ".call_lname" ).text(response.content.lname);
+    $( ".call_phone" ).text(response.content.phone);
+    $( ".call_position" ).text(response.content.position);
+    $( ".call_status" ).text(response.content.status);
+    $( ".call_description" ).text(response.content.description);
+    $( ".call_date" ).text(response.content.date);
+    $( ".time" ).val("");
+    $( ".date" ).val("");
+
+    $( ".call_id" ).text(response.content.id);
+    console.log(response.content.status);
+    if(response.content.status == "Accepted"){//
+      $(".status").html('<i class="icon fa fa-check-square-o" title="Accepted"></i>');
+    }else if (response.content.status == "Declined") {
+      $( ".propose, .date, .time" ).show();
+      $(".status").html('<i class="icon fa fa-ban" title="Devlined"></i>');
+    }else{//stats == 2, pending
+      $( ".propose, .date, .time" ).show();
+      $(".status").html('<i class="icon fa fa-paper-plane-o" title="Pending"></i>');
+    }
+
+    $( ".response" ).text( data );
     $("#modal").fadeIn();
     $("#modal").removeClass("hide");
+
   });
 
 });
@@ -52,5 +108,107 @@ $(".del").click(function(e){
     });
 });
 
+$(".propose").click(function(e){
+    var call_id = $( ".call_id" ).text();
+    var date = $(".date").val();
+    var time = $(".time").val();
+    if(date == "" ||  time == ""){
+      $(".date").animate({backgroundColor: '#F0DEDE'}, 'slow');
+      $(".time").animate({backgroundColor: '#F0DEDE'}, 'slow');
+      return;
+    }
+
+    $.post( "/updatecall/"+call_id, {"date":date, "time":time})
+    .done(function( data ) {
+      data = JSON.parse(data);
+      if(data.success == true){
+        $('.cancel').trigger('click');
+      }else{
+      }
+    });
+});
+
+$( ".time, .date" ).focus(function() {
+  $(".date").animate({backgroundColor: '#FFFFFF'}, 'slow');
+  $(".time").animate({backgroundColor: '#FFFFFF'}, 'slow');
+});
+
+$(".edit").click(function(e){
+  $(".edit, .propose, .del, .time, .date").hide();
+  $(".save, .cancel").show();
+  $( ".call_fname" ).html('<input class="field_input" type="text" value="'+$( ".call_fname" ).text()+'">');
+  $( ".call_lname" ).html('<input class="field_input" type="text" value="'+$( ".call_lname" ).text()+'">');
+  $( ".call_phone" ).html('<input class="field_input" type="text" value="'+$( ".call_phone" ).text()+'">');
+  $( ".call_position" ).html('<input class="field_input" type="text" value="'+$( ".call_position" ).text()+'">');
+  //$( ".call_status" ).html('<input class="field_input" type="text" value="'+$( ".call_status" ).text()+'">');
+  $( ".call_description" ).html('<textarea class="text_input">'+$( ".call_description" ).text()+'</textarea>');
+});
+
+$(".cancel").click(function(e){
+  var call_id = $( ".call_id" ).text();
+  $.get( "/getcall/"+call_id, function( data ) {
+    response = JSON.parse(data);
+    $( ".propose, .date, .time, .save, .cancel" ).hide();
+    $( ".edit, .del, .time, .date, .propose" ).show();
+
+    $( ".call_fname" ).text(response.content.fname);
+    $( ".call_lname" ).text(response.content.lname);
+    $( ".call_phone" ).text(response.content.phone);
+    $( ".call_position" ).text(response.content.position);
+    $( ".call_status" ).text(response.content.status);
+    $( ".call_description" ).text(response.content.description);
+    $( ".call_date" ).text(response.content.date);
+    $( ".time" ).val("");
+    $( ".date" ).val("");
+
+    $( ".call_id" ).text(response.content.id);
+    console.log(response.content.status);
+    if(response.content.status == "Accepted"){//
+      $(".status").html('<i class="icon fa fa-check-square-o" title="Accepted"></i>');
+    }else if (response.content.status == "Declined") {
+      $( ".propose, .date, .time" ).show();
+      $(".status").html('<i class="icon fa fa-ban" title="Devlined"></i>');
+    }else{//stats == 2, pending
+      $(".status").html('<i class="icon fa fa-paper-plane-o" title="Pending"></i>');
+    }
+
+    $( ".response" ).text( data );
+    $("#modal").fadeIn();
+    $("#modal").removeClass("hide");
+
+  });
+});
+
+$(".save").click(function(e){
+  var call_id = $( ".call_id" ).text();
+  var fname = $( ".call_fname input" ).val();
+  var lname = $( ".call_lname input" ).val();
+  var phone = $( ".call_phone input" ).val();
+  var position = $( ".call_position input" ).val();
+  var description = $( ".call_description textarea" ).val();
+
+  var data = {"fname":fname, "lname":lname, "phone":phone, "position":position, "description":description};
+
+  $.post( "/updatecall/"+call_id, data)
+  .done(function( data ) {
+    data = JSON.parse(data);
+    if(data.success == true){
+      $('.cancel').trigger('click');//resets modal
+    }else{
+    }
+  });
+
+});
+
+$(function() {
+  $(".date").datepicker();
+});
+$(function() {
+  $('.time').timepicker({
+    'step': function(i) {
+        return (i%2) ? 15 : 45;
+    }
+  });
+});
 </script>
 {% endblock %}

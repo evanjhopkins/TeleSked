@@ -32,6 +32,50 @@
 .new_call{
 	float: right;
 }
+.name{
+	font-size: 35px;
+	font-family: 'Open Sans', sans-serif;
+}
+.status{
+	float: right;
+}
+.status_msg{
+	font-size: 20px;
+	color: #707070;
+}
+.info_title{
+	color: #6695CC;
+	font-size: 15px;
+}
+.call_info_table{
+	width: 90%;
+	margin-left: 5%;
+	font-size: 20px;
+}
+.left{
+	float: left;
+	width: 49.5%;
+}
+.right{
+	float: right;
+	width: 49.5%;
+}
+.info_bit{
+	color: #333333;
+	margin-bottom: 5px;
+	font-family: 'Open Sans', sans-serif;
+}
+.info_bit .double{
+	width: 100%;
+	float: left;
+}
+.modal_btns{
+	float: left;
+	width: 100%;
+}
+.call_description{
+	font-size: 15px;
+}
 
 .pending{
 	background-color: #FCF8E1;
@@ -47,7 +91,7 @@
 }
 
 .call_info{
-	margin-bottom: 25px;
+	margin-bottom: 10px;
 }
 #modal_content{
 	float: left;
@@ -63,4 +107,35 @@
 }
 .del:hover{
 	background-color: #993333;
+}
+.propose{
+	margin-right: 5px;
+	background-color: #7F9E62;
+}
+.date, .time{
+	height: 29px;
+	font-size: 15px;
+	border: solid 1px #829E5A;
+}
+.date{
+	width: 85px;
+	border-right: none;
+}
+.time{ width: 65px;
+margin-right: 5px;}
+
+.propose:hover{
+	background-color: #9CB584;
+}
+.field_input{
+  width: 60%;
+	max-width: 250px;
+  font-size: 15px;
+  padding: 5px;
+}
+.text_input{
+	width: 60%;
+}
+.save{
+	margin-right: 5px;
 }
