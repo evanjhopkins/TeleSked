@@ -13,8 +13,9 @@
   {% for call in data.calls %}
   <div class="call {{call['status']}}" id="{{call['id']}}">
     <div class="name">
-      {{call['fname']}} {{call['lname']}}
-       <span class="position">({{call['position']}})</span></div>
+       <span class="fullname">{{call['fname']}} {{call['lname']}}</span>
+       <span class="position">({{call['position']}})</span>
+     </div>
     {% if call['status']=='accepted' %}
       <div class="subtext">Call accepted at: {{call['calltime']}}</div>
       <i class="icon fa fa-check-square-o" title="Accepted"></i>
@@ -220,6 +221,8 @@ $(".save").click(function(e){
     data = JSON.parse(data);
     if(data.success == true){
       $('.cancel').trigger('click');//resets modal
+      $('.call[id="'+call_id+'"] .name .fullname').text(fname+" "+lname);
+      $('.call[id="'+call_id+'"] .name .position').text("("+position+")");
       update();
     }else{
     }
