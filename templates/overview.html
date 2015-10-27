@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-  <button onclick="window.location.href='/schedule'" class="new_call">Schedule Call <i class="fa fa-plus-square-o"></i></button>
+  <button class="new_call">Schedule Call <i class="fa fa-plus-square-o"></i></button>
   {% for call in data.calls %}
   <div class="call {{call['status']}}" id="{{call['id']}}">
     <div class="name">
@@ -32,7 +32,7 @@
 {% block modal %}
 <div class="call_info">
   <span class="call_id hide"></span>
-  <span class="call_fname name"></span> <span class="call_lname name"></span><span class="status name"></span>
+  <span class="call_fname name"></span> <span class="call_lname name"></span><span class="status name"></span> <div class="updated"><i class="fa fa-cloud"></i>Updated</div>
   <hr>
   <div class="call_info_table">
     <div class="left">
@@ -43,6 +43,7 @@
       <div class="info_bit"><span class="info_title">Status:</span><br><span class="call_status"></span></div>
       <div class="info_bit"><span class="info_title">Call Date:</span><br><span class="call_date"></span></div>
     </div><br>
+
     <div class="info_bit"><span class="info_title double">Description:</span><br><span class="call_description"></span></div>
 
     <!-- <div class="info_bit"><span class="info_title">Response</span><br><span class="response"></span></div> -->
@@ -60,6 +61,30 @@
 <input class="date btn" type="text" placeholder="date">
 <button class="del btn">Cancel Call</button>
 </div>
+{% endblock %}
+
+{% block modal2 %}
+<span class="name">Schedule Call</span>
+<hr>
+<div class="error_container">
+  <div class="addcall_error hide"></div>
+</div>
+<div class="addcall">
+  <div class="left">
+    <div class="info_bit"><span class="info_title">First Name:</span><br><input class="field_input" name="fname" type="text" /></div>
+    <div class="info_bit"><span class="info_title">Last Name:</span><br><input class="field_input" name="lname" type="text" /></div>
+    <div class="info_bit"><span class="info_title">Date:</span><br><input class="field_input date2" name="date" type="text" /></div>
+  </div>
+  <div class="right">
+    <div class="info_bit"><span class="info_title">Phone:</span><br><input class="field_input" name="phone" type="text" /></div>
+    <div class="info_bit"><span class="info_title">Position:</span><br><input class="field_input" name="position" type="text" /></div>
+    <div class="info_bit"><span class="info_title">Time:</span><br><input class="field_input time2" name="time" type="text" /></div>
+  </div><br>
+  <div class="info_bit"><span class="info_title double">Description:</span><br><textarea name="description" class="new_desc"></textarea></div>
+</div>
+<hr style="width: 100%;">
+<button class="addcall_btn">Schedule Call</button>
+
 {% endblock %}
 
 {% block script %}
@@ -123,6 +148,7 @@ $(".propose").click(function(e){
       data = JSON.parse(data);
       if(data.success == true){
         $('.cancel').trigger('click');
+        update();
       }else{
       }
     });
@@ -141,7 +167,7 @@ $(".edit").click(function(e){
   $( ".call_phone" ).html('<input class="field_input" type="text" value="'+$( ".call_phone" ).text()+'">');
   $( ".call_position" ).html('<input class="field_input" type="text" value="'+$( ".call_position" ).text()+'">');
   //$( ".call_status" ).html('<input class="field_input" type="text" value="'+$( ".call_status" ).text()+'">');
-  $( ".call_description" ).html('<textarea class="text_input">'+$( ".call_description" ).text()+'</textarea>');
+  $( ".call_description" ).html('<textarea class="text_input new_desc ">'+$( ".call_description" ).text()+'</textarea>');
 });
 
 $(".cancel").click(function(e){
@@ -194,17 +220,66 @@ $(".save").click(function(e){
     data = JSON.parse(data);
     if(data.success == true){
       $('.cancel').trigger('click');//resets modal
+      update();
     }else{
     }
   });
 
 });
 
+function update(){
+  $( ".updated" ).fadeIn( "slow", function() {
+    setTimeout(function(){
+      $( ".updated" ).fadeOut();
+    }, 2000);
+  });
+}
+
+$(".addcall_btn").click(function(){
+  var data = {
+              "fname":$(".field_input[name='fname']").val(),
+              "lname": $(".field_input[name='lname']").val(),
+              "phone":$(".field_input[name='phone']").val(),
+              "position":$(".field_input[name='position']").val(),
+              "date":$(".field_input[name='date']").val(),
+              "time":$(".field_input[name='time']").val(),
+              "description":$(".new_desc").val()
+             }
+
+  //make request
+  $.post( "/addcall", data)
+  .done(function( data ) {
+    data = JSON.parse(data);
+    if(data.success == true){
+      window.location.href='/overview'
+      return;
+    }else{
+      console.log(data);
+      $(".addcall_error").text(data.alerts[0].msg);
+      $(".addcall_error").fadeIn();
+    }
+  })
+  .fail(function(e) {
+    $(".addcall_error").text("Error");
+    $(".addcall_error").fadeIn();
+  });
+});
+
+$(".new_call").click(function(){
+  $(".field_input").val("");//clear inputs
+  $(".new_desc").val("");//    ^^
+  $(".addcall_error").text("");//reset error msg
+  $(".addcall_error").hide();//   ^^
+
+  $("#modal2").fadeIn();
+  $("#modal2").removeClass("hide");
+});
+
 $(function() {
-  $(".date").datepicker();
+  $(".date, .date2").datepicker();
 });
 $(function() {
-  $('.time').timepicker({
+  $('.time, .time2').timepicker({
     'step': function(i) {
         return (i%2) ? 15 : 45;
     }

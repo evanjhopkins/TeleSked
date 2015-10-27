@@ -18,6 +18,12 @@
       </div>
     </div>
 
+    <div id="modal2" class="hide">
+      <div id="modal_content2">
+        {% block modal2 %}{% endblock %}
+      </div>
+    </div>
+
     <div id="wrapper">
       <div id="header">
         <div class="topbar">
@@ -47,7 +53,11 @@
     $("#modal").fadeOut();
     $("#modal").addClass("hide");
   });
-  $("#modal_content").click(function(e){
+  $("#modal2").click(function(){
+    $("#modal2").fadeOut();
+    $("#modal2").addClass("hide");
+  });
+  $("#modal_content, #modal_content2").click(function(e){
     e.stopPropagation();//prevent dismissal
   });
   </script>

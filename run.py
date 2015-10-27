@@ -56,7 +56,14 @@ def addcall():
 		return prepare_for_departure(success=False)
 
 	data = request.form
-	sql = "INSERT INTO `CALL` (PHONE, FNAME, LNAME, POSITION, DESCRIPTION, STATUS, REP_ID) VALUES('%s', '%s', '%s', '%s', '%s', 2, '%s')" % (data['phone'], data['fname'], data['lname'], data['position'], data['description'], session['uid'])
+	for elem in data:
+		if elem == "description":
+			continue
+		if data[elem]=="":
+			return prepare_for_departure(success=False, alerts=[error("Must complete all required fields")])
+			
+	date = format_date_for_sql(data['date'], data['time'])
+	sql = "INSERT INTO `CALL` (PHONE, FNAME, LNAME, POSITION, DESCRIPTION, STATUS, REP_ID, CALL_TIME) VALUES('%s', '%s', '%s', '%s', '%s', 2, '%s', '%s')" % (data['phone'], data['fname'], data['lname'], data['position'], data['description'], session['uid'], date)
 	query(sql)
 
 	sms = "Hey %s, you have been scheduled for an call with [NAME] of [ORG] at %s on %s. Reply 'y' if this works for you or 'n' if not." % (data['fname'], data['time'], data['date'])
