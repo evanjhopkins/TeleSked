@@ -93,6 +93,11 @@ Vagrant.configure(2) do |config|
      pip install Flask
      # install Flask Session for server side connection
      pip install Flask-Sessions
+     # install python requests plugin
+     pip install requests
+     # populate database
+     echo "CREATE DATABASE telesked;" | mysql -u root -psked
+     mysql -u root -psked telesked < /home/vagrant/telesked/populate.sql
   SHELL
 
 #######################################
