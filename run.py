@@ -61,7 +61,7 @@ def addcall():
 			continue
 		if data[elem]=="":
 			return prepare_for_departure(success=False, alerts=[error("Must complete all required fields")])
-			
+
 	date = format_date_for_sql(data['date'], data['time'])
 	sql = "INSERT INTO `CALL` (PHONE, FNAME, LNAME, POSITION, DESCRIPTION, STATUS, REP_ID, CALL_TIME) VALUES('%s', '%s', '%s', '%s', '%s', 2, '%s', '%s')" % (data['phone'], data['fname'], data['lname'], data['position'], data['description'], session['uid'], date)
 	query(sql)
@@ -69,6 +69,16 @@ def addcall():
 	sms = "Hey %s, you have been scheduled for an call with [NAME] of [ORG] at %s on %s. Reply 'y' if this works for you or 'n' if not." % (data['fname'], data['time'], data['date'])
 	r = requests.post("https://api.plivo.com/v1/Account/MAYZU1ZDC4ODUXODI2Y2/Message/", data = ('{"src":"16622221708","dst":"%s","text":"%s"}' % (data['phone'], sms)), headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}, auth=HTTPBasicAuth('MAYZU1ZDC4ODUXODI2Y2', 'MGFkMTU0MmZmNDcyYjJhZGZkZWRjM2I4NDZkYzg2'))
 	return prepare_for_departure(success=True)
+
+@app.route('/getcalls')
+def getcalls():
+	calls = {'calls':[]}
+	results = query("SELECT `CALL`.FNAME, `CALL`.LNAME, `CALL`.POSITION, STATUS.STATUS, `CALL`.ID FROM `CALL`, STATUS WHERE `CALL`.REP_ID ='%s' AND `CALL`.STATUS = STATUS.ID" % session['uid'])
+	for call in results:
+		calltime = call[4]
+		calls['calls'].append({'fname':call[0], 'lname':call[1], 'position':call[2], 'status':call[3], 'id':call[4] })
+
+	return prepare_for_departure(success=True, content=calls)
 
 @app.route('/getcall/<int:call_id>')
 def getcall(call_id):
@@ -98,7 +108,7 @@ def updatecall(call_id):
 
 	# get existing values
 	call = query("SELECT * FROM `CALL` WHERE ID=%s" % call_id)[0]
-	newcall = { "id":call[0], "phone":call[1], "fname":call[2], "lname":call[3], "position":call[4], "description":call[5], "date":call[8] }
+	newcall = { "id":call[0], "phone":call[1], "fname":call[2], "lname":call[3], "position":call[4], "description":call[5], "status":call[6], "date":call[8] }
 
 	# overwrite where applicable
 	if('phone' in data) and (data['phone'] != newcall['phone']):
@@ -116,11 +126,33 @@ def updatecall(call_id):
 		newcall['date'] = date
 		sms = "Your call has been moved to %s on %s. Reply 'y' if this works for you or 'n' if not." % (data['time'], data['date'])
 		r = requests.post("https://api.plivo.com/v1/Account/MAYZU1ZDC4ODUXODI2Y2/Message/", data = ('{"src":"16622221708","dst":"%s","text":"%s"}' % (newcall['phone'],sms)), headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}, auth=HTTPBasicAuth('MAYZU1ZDC4ODUXODI2Y2', 'MGFkMTU0MmZmNDcyYjJhZGZkZWRjM2I4NDZkYzg2'))
+		newcall['status'] = 2
 
 	# update record
-	query('UPDATE `CALL` SET PHONE="%s", FNAME="%s", LNAME="%s", POSITION="%s", DESCRIPTION="%s", CALL_TIME="%s" WHERE ID="%s"' % (newcall['phone'],newcall['fname'],newcall['lname'],newcall['position'],newcall['description'], newcall['date'], call_id ))
+	query('UPDATE `CALL` SET PHONE="%s", FNAME="%s", LNAME="%s", POSITION="%s", DESCRIPTION="%s", CALL_TIME="%s", STATUS="%s" WHERE ID="%s"' % (newcall['phone'],newcall['fname'],newcall['lname'],newcall['position'],newcall['description'], newcall['date'],newcall['status'], call_id))
 
 	return prepare_for_departure(success=True)
+
+@app.route('/recievesms', methods=["POST"])
+def recievesms():
+	data = json.loads(request.data)
+
+	if data['message'] == "y":
+		query("UPDATE `CALL` SET STATUS=1 WHERE PHONE='%s'" % data['sender'])
+		sms("Confirmed!", data['sender'])
+		return prepare_for_departure(success=True)
+
+	if data['message'] == "n":
+		query("UPDATE `CALL` SET STATUS=3 WHERE PHONE='%s'" % data['sender'])
+		sms("Okay, we will try to reschedule soon.", data['sender'])
+		return prepare_for_departure(success=True)
+
+	#sms = "Your call has been moved to %s on %s. Reply 'y' if this works for you or 'n' if not." % (data['time'], data['date'])
+	#r = requests.post("https://api.plivo.com/v1/Account/MAYZU1ZDC4ODUXODI2Y2/Message/", data = ('{"src":"16622221708","dst":"%s","text":"%s"}' % (newcall['phone'],sms)), headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}, auth=HTTPBasicAuth('MAYZU1ZDC4ODUXODI2Y2', 'MGFkMTU0MmZmNDcyYjJhZGZkZWRjM2I4NDZkYzg2'))
+	return prepare_for_departure(success=False, alerts=[warn("???")])
+
+def sms(message, reciever):
+	r = requests.post("https://api.plivo.com/v1/Account/MAYZU1ZDC4ODUXODI2Y2/Message/", data = ('{"src":"16622221708","dst":"%s","text":"%s"}' % (reciever,message)), headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}, auth=HTTPBasicAuth('MAYZU1ZDC4ODUXODI2Y2', 'MGFkMTU0MmZmNDcyYjJhZGZkZWRjM2I4NDZkYzg2'))
 
 def format_date_for_sql(date, time):
 	d = datetime.strptime((date+" "+time), '%m/%d/%Y %H:%M%p')

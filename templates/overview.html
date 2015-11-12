@@ -18,13 +18,13 @@
      </div>
     {% if call['status']=='accepted' %}
       <div class="subtext">Call accepted at: {{call['calltime']}}</div>
-      <i class="icon fa fa-check-square-o" title="Accepted"></i>
+      <div class="status"> <i class="icon fa fa-check-square-o" title="Accepted"></i> </div>
     {% elif call['status']=='pending' %}
       <div class="subtext">Call is pending acceptance from recipient</div>
-      <i class="icon fa fa-paper-plane-o" title="Pending"></i>
+      <div class="status">  <i class="icon fa fa-paper-plane-o" title="Pending"></i> </div>
     {% elif call['status']=='declined' %}
       <div class="subtext">Call was declined by recipient</div>
-      <i class="icon fa fa-ban" title="Declined"></i>
+      <div class="status"> <i class="icon fa fa-ban" title="Declined"></i> </div>
     {% endif %}
   </div>
   {% endfor %}
@@ -194,7 +194,7 @@ $(".cancel").click(function(e){
       $(".status").html('<i class="icon fa fa-check-square-o" title="Accepted"></i>');
     }else if (response.content.status == "Declined") {
       $( ".propose, .date, .time" ).show();
-      $(".status").html('<i class="icon fa fa-ban" title="Devlined"></i>');
+      $(".status").html('<i class="icon fa fa-ban" title="Declined"></i>');
     }else{//stats == 2, pending
       $(".status").html('<i class="icon fa fa-paper-plane-o" title="Pending"></i>');
     }
@@ -288,5 +288,22 @@ $(function() {
     }
   });
 });
+window.setInterval(function(){
+  $.get( "/getcalls", function( data ) {
+    response = JSON.parse(data);
+    for (i in response.content.calls){
+      call = response.content.calls[i];
+      $("#"+call.id).removeClass("pending accepted declined");
+      $("#"+call.id).addClass(call.status);
+      if(call.status == "accepted"){
+        $("#"+call.id+" .status").html('<i class="icon fa fa-check-square-o" title="Accepted"></i>');
+      }else if (call.status == "pending"){
+        $("#"+call.id+" .status").html('<i class="icon fa fa-paper-plane-o" title="Pending"></i>');
+      }else if (call.status == "declined"){
+        $("#"+call.id+" .status").html('<i class="icon fa fa-ban" title="Declined"></i>');
+      }
+    }
+  });
+}, 3000);
 </script>
 {% endblock %}
